@@ -282,6 +282,8 @@ public class CalculatorHandler implements Calculator.Iface {
 
 参考资料：
 [1] [Remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call)
-[2] [apache thrift](https://thrift.apache.org/) IPC(inter-process communication)
+
+[2] [apache thrift](https://thrift.apache.org/) 
+
 [3] [what is rpc framework and apache thrift](http://stackoverflow.com/questions/20653240/what-is-rpc-framework-and-apache-thrift)
 
