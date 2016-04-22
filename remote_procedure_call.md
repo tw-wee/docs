@@ -474,15 +474,64 @@ public class CalculatorHandler implements Calculator.Iface {
 #### 版本演进怎么处理？
 为什么需要版本演进呢？比如说有一天你希望增加或者修改一个service，但是同时又需要支持旧的service，这个时候怎么处理呢？
 
-## 为什么使用RPC能得到更好的performance?
+## 相比Restful，为什么使用RPC能得到更好的performance?
+Restful是基于Http协议的规范，其使用http method来对资源进行操作。而Thrift既可以使用HTTP，也可以使用TCP。使用TCP，就可以比HTTP减少一些消耗，比如HTTP需要定义一个相对冗长的Header，而单纯使用TCP则可能会避免。
+上面是在协议层面减小的开销。在数据传输形式上，Thrift可以选择json，也可以选择Binary及compact binary。而Restful只能使用json。在网络上传输的时候，json最终会被翻译成二进制进行传输。使用json，就必须转换一些无用的格式信息，比如括号，引号等。这些信息会导致最终传输的信息量变大。比如：
+```json
+{
+  "userName": "Martin",
+  "favouriteNumber": 1337,
+  "interests": [
+    "daydreaming",
+    "hacking"
+  ]
+}
+```
+假设一个字符占用8个bit，也就是一个byte。移除所有的空格，则需要82个bytes来对这段json进行传输。而如果使用Thrift的Binary编码方式，则只需要59个bytes。如果用Thrift的Compact Binary方式，则只需要34bytes。传输所需要的开销小了，表示同样的信息，其传输时间自然也就短了。具体过程见参考资料[5]。
 
-## Thrift与json，xml的比较
+Thrift的IDL（Interface Definition Language):
+```
+struct Person {
+  1: string       userName,
+  2: optional i64 favouriteNumber,
+  3: list<string> interests
+}
+```
+
+Bianry编码：
+![binaryprotocal](/images/binaryprotocal.png)
+
+Compact Binary编码：
+![compactprotocal](/images/compactprotocal.png)
+
+## Thrift的优点和缺点
+我觉着
+
+优点有：
+* 传输优势，既可以选择HTTP，也可以选择TCP
+* 格式优势，可以选择诸如Binary，CompactBinary之类的格式
+* 不同语言的代码自动生成
+
+缺点么：
+* 支持不够广泛，比如如果是跟浏览器通信的话，只能选择json。当然这也限定了Thrift的应用条件——用于后端services之间的通信
+* 文档，基本没有非常好的文档。
+
 ## 现在有哪些公司在使用Thrift?
+根据[Quora](https://www.quora.com/Who-uses-Apache-Thrift-in-production)上的答案，有这些公司：
+* Evernote
+* Quora
+* Facebook
+* Pinterest
+
+总的来说，Thrift是一个比较好的RPC框架，适用于后端service之间的通信。在选择Binary格式的时候，可以在带宽有限的情况下传输更多数据，同时也更快。其提供的代码生成工具能够生成不同语言的Thrift通信代码。
 
 参考资料：
 
 [1] [Remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call)
-[2] [apache thrift](https://thrift.apache.org/) 
-[3] [what is rpc framework and apache thrift](http://stackoverflow.com/questions/20653240/what-is-rpc-framework-and-apache-thrift)
-[4] [apache thrift concepts](https://thrift.apache.org/docs/concepts)
+[2] [Apache Thrift](https://thrift.apache.org/) 
+[3] [What is rpc framework and apache thrift](http://stackoverflow.com/questions/20653240/what-is-rpc-framework-and-apache-thrift)
+[4] [Apache thrift concepts](https://thrift.apache.org/docs/concepts)
+[5] [Schema evolution in Avro, Protocol Buffers and Thrift](http://martin.kleppmann.com/2012/12/05/schema-evolution-in-avro-protocol-buffers-thrift.html)
+[6] [Thrift missing guide](https://diwakergupta.github.io/thrift-missing-guide)
+[7] [Thrift tutorial](http://thrift-tutorial.readthedocs.org/en/latest/thrift-stack.html)
 
