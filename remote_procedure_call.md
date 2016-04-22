@@ -473,6 +473,14 @@ public class CalculatorHandler implements Calculator.Iface {
 
 #### 版本演进怎么处理？
 为什么需要版本演进呢？比如说有一天你希望增加或者修改一个service，但是同时又需要支持旧的service，这个时候怎么处理呢？
+根据[Thrift: Scalable Cross-Language Services Implementation](https://thrift.apache.org/static/files/thrift-20070401.pdf)，有四种情况：
+* Added field，old client，new
+  server。增加了东西（或者增加新的方法，或者增加了新的方法参数）。server是新的，客户端是老的。这时候客户端call的还是老的未增加的方法。此时，新的server应当能够对老方法进行支持。比如增加了方法，旧方法没有改动，可以直接调用旧方法。增加了方法参数，这时候就看server的逻辑，如果新增的参数是optional的，那么可以返回结果。如果不是，则可以返回错误信息。
+* Added field，new client, old server。新客户端调用了新方法，此时会往server发送一个请求，但是旧server不认这个新方法，所以直接忽略掉。新方法增加参数，也是直接忽略掉。
+* Removed field, old client, new server。跟上面的类似，旧客户端调用已经移除的方法，server直接忽略。
+* Removed field, new client, old server。删除旧方法，客户端只能调用原有其他方法，此时server可以直接处理。但是如果是删除参数，那么server可能不知道如何处理参数缺失的状况。
+
+当然了，如果碰到实在无法适应的变化，可以通过比如java中的package名字来做区分，比如li.koly.calculator.v1，li.koly.calculator.v2等。
 
 ## 相比Restful，为什么使用RPC能得到更好的performance?
 Restful是基于Http协议的规范，其使用http method来对资源进行操作。而Thrift既可以使用HTTP，也可以使用TCP。使用TCP，就可以比HTTP减少一些消耗，比如HTTP需要定义一个相对冗长的Header，而单纯使用TCP则可能会避免。
@@ -499,10 +507,10 @@ struct Person {
 ```
 
 Bianry编码：
-![binaryprotocal](/images/binaryprotocal.png)
+![binaryprotocal](./images/binaryprotocal.png)
 
 Compact Binary编码：
-![compactprotocal](/images/compactprotocal.png)
+![compactprotocal](./images/compactprotocal.png)
 
 ## Thrift的优点和缺点
 我觉着
@@ -523,15 +531,25 @@ Compact Binary编码：
 * Facebook
 * Pinterest
 
+最后，顺便贴一下参考资料[9]中提到的使用JSON的场景：
+* You need or want data to be human readable
+* Data from the service is directly consumed by a web browser
+* Your server side application is written in JavaScript
+* You aren’t prepared to tie the data model to a schema
+* You don’t have the bandwidth to add another tool to your arsenal
+* The operational burden of running a different kind of network service is too great
+
 总的来说，Thrift是一个比较好的RPC框架，适用于后端service之间的通信。在选择Binary格式的时候，可以在带宽有限的情况下传输更多数据，同时也更快。其提供的代码生成工具能够生成不同语言的Thrift通信代码。
 
 参考资料：
 
 [1] [Remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call)
-[2] [Apache Thrift](https://thrift.apache.org/) 
+[2] [Apache Thrift](https://thrift.apache.org/)
 [3] [What is rpc framework and apache thrift](http://stackoverflow.com/questions/20653240/what-is-rpc-framework-and-apache-thrift)
 [4] [Apache thrift concepts](https://thrift.apache.org/docs/concepts)
 [5] [Schema evolution in Avro, Protocol Buffers and Thrift](http://martin.kleppmann.com/2012/12/05/schema-evolution-in-avro-protocol-buffers-thrift.html)
 [6] [Thrift missing guide](https://diwakergupta.github.io/thrift-missing-guide)
 [7] [Thrift tutorial](http://thrift-tutorial.readthedocs.org/en/latest/thrift-stack.html)
+[8] [Thrift: Scalable Cross-Language Services Implementation](https://thrift.apache.org/static/files/thrift-20070401.pdf)
+[9] [Choose protocal buffers](http://blog.codeclimate.com/blog/2014/06/05/choose-protocol-buffers/)
 
