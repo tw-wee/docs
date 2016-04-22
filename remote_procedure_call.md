@@ -89,6 +89,7 @@ public class JavaClient {
             TTransport transport;
             transport = new TSocket("localhost", 9090);
             transport.open();
+            // 数据以二进制的形式传输
             TProtocol protocol = new TBinaryProtocol(transport);
             Calculator.Client client = new Calculator.Client(protocol);
 
@@ -104,6 +105,7 @@ public class JavaClient {
         client.ping();
         System.out.println("ping()");
 
+        // Calculator.Client 实现了Calculator.Iface，所以可以调用add方法
         int sum = client.add(1, 1);
         System.out.println("1+1=" + sum);
 
@@ -134,7 +136,7 @@ public class JavaClient {
     }
 }
 ```
-这个是client，其中重点请参考注释。
+这个是client，其中有注释。
 下面是server。
 ```
 package li.koly;
@@ -170,7 +172,7 @@ public class JavaServer {
                     simple(processor);
                 }
             };
-
+            
             new Thread(simple).start();
         } catch (Exception x) {
             x.printStackTrace();
@@ -205,6 +207,7 @@ import shared.*;
 
 import java.util.HashMap;
 
+// Calculator.Iface定义了在service.thrift文件中定义的那些方法
 public class CalculatorHandler implements Calculator.Iface {
 
     private HashMap<Integer,SharedStruct> log;
@@ -277,13 +280,14 @@ public class CalculatorHandler implements Calculator.Iface {
 为什么需要版本演进呢？比如说有一天你希望增加或者修改一个service，但是同时又需要支持旧的service，这个时候怎么处理呢？
 
 ## 为什么使用RPC能得到更好的performance?
+
 ## Thrift与json，xml的比较
 ## 现在有哪些公司在使用Thrift?
 
 参考资料：
+
 [1] [Remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call)
-
 [2] [apache thrift](https://thrift.apache.org/) 
-
 [3] [what is rpc framework and apache thrift](http://stackoverflow.com/questions/20653240/what-is-rpc-framework-and-apache-thrift)
+[4] [apache thrift concepts](https://thrift.apache.org/docs/concepts)
 
