@@ -507,10 +507,10 @@ struct Person {
 ```
 
 Bianry编码：
-![binaryprotocal](./images/binaryprotocal.png)
+![binaryprotocal](./images/binaryprotocol.png)
 
 Compact Binary编码：
-![compactprotocal](./images/compactprotocal.png)
+![compactprotocal](./images/compactprotocol.png)
 
 ## Thrift的优点和缺点
 我觉着
@@ -543,13 +543,13 @@ Compact Binary编码：
 
 参考资料：
 
-[1] [Remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call)
-[2] [Apache Thrift](https://thrift.apache.org/)
-[3] [What is rpc framework and apache thrift](http://stackoverflow.com/questions/20653240/what-is-rpc-framework-and-apache-thrift)
-[4] [Apache thrift concepts](https://thrift.apache.org/docs/concepts)
-[5] [Schema evolution in Avro, Protocol Buffers and Thrift](http://martin.kleppmann.com/2012/12/05/schema-evolution-in-avro-protocol-buffers-thrift.html)
-[6] [Thrift missing guide](https://diwakergupta.github.io/thrift-missing-guide)
-[7] [Thrift tutorial](http://thrift-tutorial.readthedocs.org/en/latest/thrift-stack.html)
-[8] [Thrift: Scalable Cross-Language Services Implementation](https://thrift.apache.org/static/files/thrift-20070401.pdf)
-[9] [Choose protocal buffers](http://blog.codeclimate.com/blog/2014/06/05/choose-protocol-buffers/)
+[1] [Remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call) 
+[2] [Apache Thrift](https://thrift.apache.org/) 
+[3] [What is rpc framework and apache thrift](http://stackoverflow.com/questions/20653240/what-is-rpc-framework-and-apache-thrift) 
+[4] [Apache thrift concepts](https://thrift.apache.org/docs/concepts) 
+[5] [Schema evolution in Avro, Protocol Buffers and Thrift](http://martin.kleppmann.com/2012/12/05/schema-evolution-in-avro-protocol-buffers-thrift.html) 
+[6] [Thrift missing guide](https://diwakergupta.github.io/thrift-missing-guide) 
+[7] [Thrift tutorial](http://thrift-tutorial.readthedocs.org/en/latest/thrift-stack.html) 
+[8] [Thrift: Scalable Cross-Language Services Implementation](https://thrift.apache.org/static/files/thrift-20070401.pdf) 
+[9] [Choose protocal buffers](http://blog.codeclimate.com/blog/2014/06/05/choose-protocol-buffers/) 
 
