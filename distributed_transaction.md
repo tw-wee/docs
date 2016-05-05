@@ -337,14 +337,23 @@ private ConnectionFactory nonXaConnectionFactory;
 
 
 [Distributed Transactions in a Cloud-Native, Microservice World](https://medium.com/@KevinHoffman/distributed-transactions-in-a-cloud-native-microservice-world-7528f8baa8da#.1p3gx3w1x)
+
 [Pattern: Microservices Architecture](http://microservices.io/patterns/microservices.html)
+
 [微服务和演进式架构](http://insights.thoughtworkers.org/evolutionary-architecture-micro-services/)
+
 [微服务：分解应用以实现可部署性和可扩展性](http://www.infoq.com/cn/articles/microservices-intro)
+
 [微服务分布式事务的一些思考](http://www.cnblogs.com/skyblog/p/4930015.html)
+
 [微服务架构模式简介](http://blog.jobbole.com/96948/)
+
 [Microservices](https://www.tigerteam.dk/2014/micro-services-its-not-only-the-size-that-matters-its-also-how-you-use-them-part-2/)
+
 [Transactions across REST microservices?](http://stackoverflow.com/questions/30213456/transactions-across-rest-microservices)
+
 [What is the most accepted transaction strategy for microservices](http://programmers.stackexchange.com/questions/290917/what-is-the-most-accepted-transaction-strategy-for-microservices)
+
 [Transactions across REST microservices?](http://stackoverflow.com/questions/30213456/transactions-across-rest-microservices)
 
 ----
