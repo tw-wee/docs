@@ -305,4 +305,48 @@ private ConnectionFactory nonXaConnectionFactory;
 ### 支持可选的内置事务管理器
 `XAConnectionFactoryWrapper`和`XADataSourceWrapper`接口可以用于支持可选的内置事务管理器，具体代码示例参见[Write XA wrappers Exmaples](https://github.com/spring-projects/spring-boot/tree/v1.3.3.RELEASE/spring-boot/src/main/java/org/springframework/boot/jta).
 
+----
+
+# Microservice分布式事务
+
+对于微服务的分布式事务处理，确实很棘手，而且目前也没有特别成型的方案来解决这一问题，接下来大概描述一些原则和方案：
+
+## Single Responsibility Principle SRP，单一职责原则
+通常需要处理事务的时候，说明Service需要把多个操作视为一个整体，把多个处理操作隐藏在一个Service内部作为一个事务是没有问题的，但问题是如果需要跨越多个Services处理分布式事务就比较麻烦了，但如果出现这样的情况，首先考虑一下Service是否满足SRP，是否需要把某一种事务操作放在一个Service中而不是放在多个Services中，比如注册应该在一个Service中完成，尽量划分清Service的边界，在设计上规避分布式事务的情况，从而可以简化问题。
+
+## Natively Transactional APIs 本地化的事务APIs
+考虑一下这样的情形，你需要在网上购买一件衣服，购买行为通常是包含付款操作的，整个一个购买->付款->发货->...流程形成的活动作为一个Transaction，这个Transaction会和一个订单号关联，内部可能由多个Service实现，而一定会有某个API提供这样一个购买功能，把各操作封装起来，那这个API会有自己的事务，这就称为Natively Transactional API.
+
+> if you need a DTC you’re doing it wrong. There is almost always a better way and, in many cases, refactoring out the need for a DTC provides huge ROI in terms of other benefits — elegant design, performance, scalability, reliability, etc.
+
+## Assumptive Failure and Eventual Consistency 假定失败 & 最终一致性
+在经典的DTC (distributed transaction coordinator)/two-phase commit 场景下，会有一段代码触发事务，另一段代码处理任务并且来对事务进行判定，只要有某一操作失败，其他操作全部失效，事务回滚，如果是对于非Microservice的常规分布式事务是适用的。但如果在Microservice下，操作发生时间和地点都不同，有异步有同步，有并行有串行，所以DTC是行不通的。再来看一个例子，比如在线购买机票，从搜索到订票，通常票会被临时锁定到你的帐户下，但如果你不支付，过了有一段时间票就会被退回，这其实是一个最终一致性的雏形。在Microservice架构下，服务不可预见的顺序，随机的调用失败等等，与其害怕不如接受假定会失败的事实，正如之前买票，正常流程时用户支付，买票流程结束，但通常用户不会支付，所以票应该被退回，总之，如果用户支付了就拿到票，不支付退回票，达到最终一致性。
+
+## 事件驱动的异步操作
+服务发布事件声明有些数据发生了变化，其他的服务订阅这些事件并更新它们的数据，保证自己必须得到通知并处理才会丢弃通知消息，这样就简化成了DB和Message之间的事务处理了。这种方式主要的优点在于事件的生产者和消费者实现了解耦，这不仅简化了开发，相对于分布式事务，它还提升了可用性，但牺牲了一致性。
+
+比如Message Broker就是一个消息的中转平台。该平台允许其它组成向其中注册消息，也允许其它组成侦听消息。当一个组成将一个消息发送到了Message Broker之上后，其它侦听该消息的各个组成则会根据消息中所包含的信息更新自己的状态。
+
+
+## 小结
+> The best design is having isolated services: each service just do its work within its own transaction and your workflow expects failures on the single service.
+
+> If you really need to commit only if all the services are called without errors you should create an higher level service that perform those calls inside an external transaction.
+
+也就是说，通常的做法是尽量隔离这些Microservices，把每一个Microservice当作一个独立单元，包括独立完整的事务处理，这样减少分布式事务出现情形。如果确实需要在每个Service都正确调用并处理后才提交事务，那么可以创建一个更高层次的Service来调用各个服务并协调内部事务。最后，推荐优先考虑事件驱动和假定失败方案，为了保证最终一致性，需要临时创建一个中转消息中心，一旦消息被正确处理，则事务完成，否则失败，回滚操作。
+
+
+[Distributed Transactions in a Cloud-Native, Microservice World](https://medium.com/@KevinHoffman/distributed-transactions-in-a-cloud-native-microservice-world-7528f8baa8da#.1p3gx3w1x)
+[Pattern: Microservices Architecture](http://microservices.io/patterns/microservices.html)
+[微服务和演进式架构](http://insights.thoughtworkers.org/evolutionary-architecture-micro-services/)
+[微服务：分解应用以实现可部署性和可扩展性](http://www.infoq.com/cn/articles/microservices-intro)
+[微服务分布式事务的一些思考](http://www.cnblogs.com/skyblog/p/4930015.html)
+[微服务架构模式简介](http://blog.jobbole.com/96948/)
+[Microservices](https://www.tigerteam.dk/2014/micro-services-its-not-only-the-size-that-matters-its-also-how-you-use-them-part-2/)
+[Transactions across REST microservices?](http://stackoverflow.com/questions/30213456/transactions-across-rest-microservices)
+[What is the most accepted transaction strategy for microservices](http://programmers.stackexchange.com/questions/290917/what-is-the-most-accepted-transaction-strategy-for-microservices)
+[Transactions across REST microservices?](http://stackoverflow.com/questions/30213456/transactions-across-rest-microservices)
+
+----
+
 
